@@ -21,7 +21,7 @@ function main(){
     }
 
     // ドラム
-    function createDrum(images, topSpeed, accelSpeed, onclick){
+    function createDrum(images){
         var obj = document.createElement("div");
         obj.style.position = "absolute";
         obj.style.overflow = "hidden";
@@ -34,17 +34,19 @@ function main(){
             obj.appendChild(obj.img[i]);
         }
 
-        obj.turnTopSpeed = topSpeed; // 最高速
-        obj.turnAccelSpeed = accelSpeed; // 加速度
+        obj.turnTopSpeed = 0; // 最高速
+        obj.turnAccelSpeed = 0; // 加速度
         obj.turnSpeed = 0; // 回転スピード
-        obj.turnPos = 0;//Math.floor(Math.random() * obj.img.length); // 回転位置
+        obj.turnPos = 0; // 回転位置
         obj.LastImgIndex = obj.turnPos; // 前回の表示画像インデックス
 
         obj.imgWidth = 0; // 横幅
 
         // ドラムの回転ON/OFF
         obj.start = false;
-        obj.startTurn = function(){
+        obj.startTurn = function(topSpeed, accelSpeed){
+            this.turnTopSpeed = topSpeed; // 最高速
+            this.turnAccelSpeed = accelSpeed; // 加速度
             this.start = true;
         }
         obj.stopTurn = function(){
@@ -120,9 +122,9 @@ function main(){
         document.body.style.overflow = "hidden";
 
         // ドラム作成
-        const drum1 = createDrum(images, 0.117, 0.004);
-        const drum2 = createDrum(images, 0.113, 0.002);
-        const drum3 = createDrum(images, 0.107, 0.001);
+        const drum1 = createDrum(images);
+        const drum2 = createDrum(images);
+        const drum3 = createDrum(images);
     	document.body.appendChild(drum1);
     	document.body.appendChild(drum2);
     	document.body.appendChild(drum3);
@@ -133,11 +135,16 @@ function main(){
         drum3.onclick = onClick;
         function onClick(){
             if(drum1.start || drum2.start || drum3.start){
-                this.stopTurn()
+                // 回転停止
+                this.stopTurn();
             }else{
-                drum1.startTurn();
-                drum2.startTurn();
-                drum3.startTurn();
+                function getTurnSpeed(){
+                    return 0.105 + Math.random() * 0.01;
+                }
+                // 回転スタート
+                drum1.startTurn(getTurnSpeed(), 0.004);
+                drum2.startTurn(getTurnSpeed(), 0.002);
+                drum3.startTurn(getTurnSpeed(), 0.001);
             }
             requestAnimation();
         }
