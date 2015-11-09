@@ -67,7 +67,7 @@ function main(){
         }
 
         // ドラムのアニメーション
-        obj.updateFrame = function(){
+        obj.updateFrame = function(frames){
             var needAnimation = true;
 
             // 表示画像インデックス
@@ -76,7 +76,7 @@ function main(){
             // 加減速
             if(this.start){
                 // 加速
-                this.turnSpeed += this.turnAccelSpeed;
+                this.turnSpeed += this.turnAccelSpeed * frames;
                 if(this.turnSpeed > this.turnTopSpeed){
                     this.turnSpeed = this.turnTopSpeed;
                 }
@@ -103,9 +103,9 @@ function main(){
             }
 
             // 原点位置更新
-            this.turnPos += this.turnSpeed;
+            this.turnPos += this.turnSpeed * frames;
             if(this.turnPos >= this.img.length){
-                this.turnPos -= this.img.length;
+                this.turnPos -= Math.floor(this.turnPos / this.img.length) * this.img.length;
             }
 
             return needAnimation;
@@ -177,16 +177,32 @@ function main(){
 
         // アニメーション開始
         var requestAnimationID;
+        var prevDate;
         requestAnimation();
         function requestAnimation(){
             if(!requestAnimationID){
                 requestAnimationID = requestAnimationFrame(function(){
                     requestAnimationID = undefined;
-                    var needAnimation = drum1.updateFrame();
-                    needAnimation |= drum2.updateFrame();
-                    needAnimation |= drum3.updateFrame();
+
+                    // 経過時間(フレーム数)取得
+                    var currentDate = Date.now();
+                    var frames = 1;
+                    if(prevDate){
+                        frames = (currentDate - prevDate) * 0.06; //60fps換算
+                    }
+                    prevDate = currentDate;
+
+                    // 各ドラムの更新
+                    var needAnimation = drum1.updateFrame(frames);
+                    needAnimation |= drum2.updateFrame(frames);
+                    needAnimation |= drum3.updateFrame(frames);
+
                     if(needAnimation){
+                        // アニメーション継続
                         requestAnimation();
+                    }else{
+                        // アニメーション停止
+                        prevDate = undefined;
                     }
                 });
             }
