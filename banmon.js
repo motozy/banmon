@@ -130,9 +130,18 @@ function main(){
     	document.body.appendChild(drum3);
 
         // クリック時の処理
-        drum1.onclick = onClick;
-        drum2.onclick = onClick;
-        drum3.onclick = onClick;
+        setClick(drum1);
+        setClick(drum2);
+        setClick(drum3);
+        function setClick(drum){
+            if(drum.ontouchstart !== undefined){
+                drum.ontouchstart = onClick;
+            }else if(drum.onmousedown !== undefined){
+                drum.onmousedown = onClick;
+            }else{
+                drum.onclick = onClick;
+            }
+        }
         function onClick(){
             if(drum1.start || drum2.start || drum3.start){
                 // 回転停止
